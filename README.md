@@ -4,7 +4,7 @@ __Maintainer: OIT Systems Engineering__ (<ua-oit-se@alaska.edu>)
 
 ## Purpose
 
-This cookbook can be used to configure both DNS client-server and server-suffix on Windows.
+The custom resources in this cookbook implement the _mechanism_ for configuring both both the DNS client-server and server-suffix on Windows.  For an example of a _policy_ for how to configure DNS, see the se-win-baseline cookbook.
 
 ## Requirements
 
@@ -68,7 +68,7 @@ This resource has five attributes.
 
 ## Recipes
 
-This is a resource-only cookbook; no recipes are provided.
+This is a resource-only cookbook; and adding the default recipe to a node's runlist will have no effect.
 
 ## Examples
 
