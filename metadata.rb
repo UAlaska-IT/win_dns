@@ -4,7 +4,7 @@ name 'win_dns'
 maintainer 'OIT Systems Engineering'
 maintainer_email 'ua-oit-se@alaska.edu'
 license 'MIT'
-description 'Installs/Configures DNS in Windows'
+description 'Provides resources for configuring DNS in Windows'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
 issues_url 'https://github.alaska.edu/oit-cookbooks/win_dns/issues' if respond_to?(:issues_url)
 source_url 'https://github.alaska.edu/oit-cookbooks/win_dns' if respond_to?(:source_url)

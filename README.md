@@ -66,6 +66,9 @@ This resource has five attributes.
 * `suffix` - The DNS suffix for this node, that will be concatenated to form a fully qualified domain name, e.g. 'alaska.edu'.
 * `register` - Default to `true`.  Determines if this node is registered for DNS lookup.
 
+## Attributes
+Resources in this cookbook do not reference any attributes.
+
 ## Recipes
 
 This is a resource-only cookbook; and adding the default recipe to a node's runlist will have no effect.
