@@ -200,12 +200,8 @@ module DNS
     end
 
     def ensure_dns_suffix(dns_suffix)
-      interfaces = parse_network_adapters
-      Chef::Log.debug("Interfaces: #{interfaces}")
-
-      interface_numbers = numbers_for_matching_interfaces(interfaces, dns_suffix.interface_name)
-
-      set_dns_suffix_for_all_interfaces(interface_numbers, dns_suffix)
+      iface_numbers = interface_numbers(dns_suffix.interface_name)
+      set_dns_suffix_for_all_interfaces(iface_numbers, dns_suffix)
     end
   end
 end
