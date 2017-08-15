@@ -187,15 +187,6 @@ module DNS
       end
     end
 
-    def numbers_of_matching_interfaces(interfaces, interface_name)
-      interface_numbers = []
-      interfaces.each do |key, val|
-        interface_numbers.push(val) if key.match?(Regexp.new(interface_name.downcase))
-      end
-      Chef::Log.debug("Interface numbers: #{interface_numbers}")
-      return interface_numbers
-    end
-
     # Returns true iff at least one interface was modified
     def set_dns_suffix_for_all_interfaces(interface_numbers, dns_suffix)
       interface_numbers.each do |iface_index|
@@ -212,7 +203,7 @@ module DNS
       interfaces = parse_network_adapters
       Chef::Log.debug("Interfaces: #{interfaces}")
 
-      interface_numbers = numbers_of_matching_interfaces(interfaces, dns_suffix.interface_name)
+      interface_numbers = numbers_for_matching_interfaces(interfaces, dns_suffix.interface_name)
 
       set_dns_suffix_for_all_interfaces(interface_numbers, dns_suffix)
     end
