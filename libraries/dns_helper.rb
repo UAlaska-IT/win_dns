@@ -172,13 +172,17 @@ module DNS
       return retval
     end
 
-    def ensure_dns_server_ips(dns_client)
+    def interface_numbers(interface_name)
       interfaces = parse_network_adapters
       Chef::Log.debug("Interfaces: #{interfaces}")
 
-      interface_numbers = numbers_for_matching_interfaces(interfaces, dns_client.interface_name)
+      return numbers_for_matching_interfaces(interfaces, interface_name)
+    end
 
-      interface_numbers.each do |iface_index|
+    def ensure_dns_server_ips(dns_client)
+      iface_numbers = interface_numbers(interface_name)
+
+      iface_numbers.each do |iface_index|
         process_interface(dns_client, iface_index)
       end
     end
