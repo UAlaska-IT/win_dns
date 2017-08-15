@@ -163,10 +163,10 @@ module DNS
       end
     end
 
-    def numbers_for_matching_interfaces(interfaces, dns_client)
+    def numbers_for_matching_interfaces(interfaces, interface_name)
       retval = []
       interfaces.each do |key, val|
-        retval.push(val) if key.match?(Regexp.new(dns_client.interface_name.downcase))
+        retval.push(val) if key.match?(Regexp.new(interface_name.downcase))
       end
       Chef::Log.debug("Interface numbers: #{retval}")
       return retval
@@ -176,7 +176,7 @@ module DNS
       interfaces = parse_network_adapters
       Chef::Log.debug("Interfaces: #{interfaces}")
 
-      interface_numbers = numbers_for_matching_interfaces(interfaces, dns_client)
+      interface_numbers = numbers_for_matching_interfaces(interfaces, dns_client.interface_name)
 
       interface_numbers.each do |iface_index|
         process_interface(dns_client, iface_index)
