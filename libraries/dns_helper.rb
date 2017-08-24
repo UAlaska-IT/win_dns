@@ -180,7 +180,7 @@ module DNS
     end
 
     def ensure_dns_server_ips(dns_client)
-      iface_numbers = interface_numbers(interface_name)
+      iface_numbers = interface_numbers(dns_client.interface_name)
 
       iface_numbers.each do |iface_index|
         process_interface(dns_client, iface_index)
