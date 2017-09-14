@@ -119,7 +119,8 @@ module DNS
         parse_dns_suffix_line(line, retval)
       end
       Chef::Log.debug("Processed #{count} lines, found #{retval.size} suffixes")
-      raise 'Failed to parse DNS suffix' if retval.size != 1
+      raise 'Failed to parse DNS suffix' if retval.size > 1
+      return '' if retval.empty?
       return retval.first
     end
 
