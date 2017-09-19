@@ -108,17 +108,21 @@ module DNS
       retval.push(line)
     end
 
-    # Parse DNS suffix for the given interface
-    def parse_dns_suffix(interface_index)
-      cmd = run_dns_suffix_script(interface_index)
-
+    def do_parse_dns_suffix(output)
       retval = []
       count = 0
-      cmd.stdout.to_s.lines.each do |line|
+      output.lines.each do |line|
         count += 1
         parse_dns_suffix_line(line, retval)
       end
       Chef::Log.debug("Processed #{count} lines, found #{retval.size} suffixes")
+      return retval
+    end
+
+    # Parse DNS suffix for the given interface
+    def parse_dns_suffix(interface_index)
+      cmd = run_dns_suffix_script(interface_index)
+      retval = do_parse_dns_suffix(cmd.stdout.to_s)
       raise 'Failed to parse DNS suffix' if retval.size > 1
       return '' if retval.empty?
       return retval.first
