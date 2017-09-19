@@ -116,7 +116,7 @@ For running tests in Test Kitchen a few dependencies must be installed.
 
 This cookbook was tested in Test Kitchen using the base box at
 
-`\\fbk-tss-store1.apps.ad.alaska.edu\Department\Technology Support Services\Engineering\Packer Boxes\win2016core-virtualbox.box`
+`\\fbk-tss-store1.apps.ad.alaska.edu\Department\Technology Support Services\Engineering\Packer Boxes\win2016gui-virtualbox.box`
 
 If this box has not been cached by Vagrant, it can be placed (without .box extension) in the kitchen-generated directory
 
@@ -124,6 +124,6 @@ If this box has not been cached by Vagrant, it can be placed (without .box exten
 
 or added to Vagrant using the shell command
 
-`vagrant box add <name> <base_box>.box`
+`vagrant box add <base_box> <base_box>.box`
 
 Windows boxes are not widely available as standard downloads, but alternative base boxes can be built, for example using [boxcutter](https://github.com/boxcutter/windows).
