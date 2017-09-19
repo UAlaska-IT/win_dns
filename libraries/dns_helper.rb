@@ -197,7 +197,7 @@ module DNS
       interface_numbers.each do |iface_index|
         curr_suffix = parse_dns_suffix(iface_index)
         Chef::Log.debug("Current suffix: #{curr_suffix}")
-        next if curr_suffix.casecmp(dns_suffix.suffix)
+        next if curr_suffix.casecmp?(dns_suffix.suffix)
         converge_by "Set DNS Suffix #{iface_index} #{dns_suffix}" do
           set_dns_suffix(iface_index, dns_suffix)
         end
