@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-include Chef::Mixin::PowershellOut
-
+# This module implements helpers that are used for DNS resources
 module DNS
+  include Chef::Mixin::PowershellOut
   # This module implements helpers that are used for DNS resources
   module Helper
     def empty_string?(string)
@@ -210,3 +210,6 @@ module DNS
     end
   end
 end
+
+Chef::Recipe.include(DNS::Helper)
+Chef::Resource.include(DNS::Helper)

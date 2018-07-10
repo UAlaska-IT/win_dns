@@ -11,8 +11,6 @@ property :use_regex_for_interface, [true, false], default: true # Use regex to m
 property :suffix, String, required: true # The suffix
 property :register, [true, false], default: true # Register this connection
 
-extend ::DNS::Helper
-
 action :set_suffix do
   set_suffix_helper(@new_resource)
 end
