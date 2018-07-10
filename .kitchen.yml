@@ -63,6 +63,11 @@ suites:
       inspec_tests:
         - test/smoke/default
     attributes:
+      win_dns:
+        interface_alias: 'ethernet'
+        nameservers: ['137.229.15.5', '137.229.15.9', '8.8.8.8']
+        suffix: 'alaska.edu'
+        register: true
     includes:
       - mwrock/Windows2016
       - devopsgroup-io/windows_server-2012r2-standard-amd64-nocm
