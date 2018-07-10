@@ -6,7 +6,6 @@ provides :dns_suffix, os: 'windows'
 
 default_action :set_suffix
 
-property :name, String, name_property: true
 property :interface_name, String, default: 'ethernet' # Not case sensitive
 property :use_regex_for_interface, [true, false], default: true # Use regex to match interfaces
 property :suffix, String, required: true # The suffix

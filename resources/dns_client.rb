@@ -6,7 +6,6 @@ provides :dns_client, os: 'windows'
 
 default_action :set_server_ips
 
-property :name, String, name_property: true
 property :interface_name, String, default: 'ethernet' # Not case sensitive
 property :use_regex_for_interface, [true, false], default: true # Use regex to match interfaces
 property :name_servers, Array, required: true # An array of nameserver IPs as strings
