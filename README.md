@@ -10,7 +10,7 @@ The custom resources in this cookbook implement the _mechanism_ for configuring 
 
 ### Chef
 
-Version 2.0.0+ of this cookbook requires Chef 13+
+This cookbook requires Chef 13+
 
 ### Platforms
 
@@ -20,14 +20,15 @@ Supported Platform Families:
 
 Platforms validated via Test Kitchen:
 
-* Windows 10
 * Windows Server 2016
+* Windows Server 2012
+* Windows Server 2008R2
+* Windows 10
 
 Notes:
 
-* Only Windows 2016 is fully tested.
-* Custom resources typically use raw PowerShell scripts for converge and idempotence.  Most recipes therefore should support older versions of Windows, but these are not tested.
-* Cookbook dependencies are handled via Berkshelf and are verified only to be compatible with Windows 2016/10.
+* Windows 2008 requires WMF update
+* Custom resources typically use raw PowerShell 5.0 scripts for converge and idempotence
 
 ## Resources
 
@@ -109,21 +110,5 @@ For running tests in Test Kitchen a few dependencies must be installed.
 * [ChefDK](https://downloads.chef.io/chef-dk/)
 * [Vagrant](https://www.vagrantup.com/)
 * [VirtualBox](https://www.virtualbox.org/wiki/Downloads)
-* Install dependency tree with `berks install`
-* Install Vagrant WinRM plugin:  `vagrant plugin install vagrant-winrm`
-
-### Windows Server 2016 Box
-
-This cookbook was tested in Test Kitchen using the base box at
-
-`\\fbk-tss-store1.apps.ad.alaska.edu\Department\Technology Support Services\Engineering\Packer Boxes\win2016gui-virtualbox.box`
-
-If this box has not been cached by Vagrant, it can be placed (without .box extension) in the kitchen-generated directory
-
-`.kitchen/kitchen-vagrant/kitchen-se-win-baseline-default-win2016gui-virtualbox/.vagrant/machines/default/virtualbox`
-
-or added to Vagrant using the shell command
-
-`vagrant box add <base_box> <base_box>.box`
-
-Windows boxes are not widely available as standard downloads, but alternative base boxes can be built, for example using [boxcutter](https://github.com/boxcutter/windows).
+* Install the dependency tree with `berks install`
+* Install the Vagrant WinRM plugin:  `vagrant plugin install vagrant-winrm`
