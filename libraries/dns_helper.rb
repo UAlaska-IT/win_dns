@@ -27,11 +27,11 @@ module DNS
       Chef::Log.debug("Line: '#{line}'")
       line = line.strip
       Chef::Log.debug("Stripped line: '#{line}'")
-      return if line_matches_or_empty?(line, /^ifIndex/) # The header
+      return if line_matches_or_empty?(line, /^[InterfaceIndex|-]/) # The header
       space = line.index(' ')
 
       index = line[0, space]
-      name = line[space + 1, line.length - space - 1]
+      name = line[space + 1, line.length - space - 1].gsub(/\s+/, ' ')
 
       retval[name.downcase] = index
     end
@@ -51,8 +51,11 @@ module DNS
     # Keys and values will be in lowercase
     def parse_network_adapters
       # netsh interface ipv4 show interfaces
-      script_code = 'Get-NetAdapter | Sort-Object ifIndex | select ifIndex, Name'
+      # Get-NetAdapter | Sort-Object ifIndex | select ifIndex, Name
+      script_code = 'Get-WMIObject Win32_NetworkAdapter | Sort-Object InterfaceIndex |
+Select InterfaceIndex, AdapterType, NetConnectionID, Name'
       cmd = log_powershell_out('parse', script_code)
+      Chef::Log.debug("\nRaw Adapters\n#{cmd.stdout.to_s.strip}")
 
       interfaces = parse_network_adapter_lines(cmd)
 
