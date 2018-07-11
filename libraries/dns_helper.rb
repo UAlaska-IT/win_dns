@@ -145,18 +145,27 @@ Select InterfaceIndex, AdapterType, NetConnectionID, Name'
       return retval
     end
 
+    def validate_empty_set_server(stream)
+      raise "Failed to set server addresses: #{stream.to_s.strip}" unless empty_string?(stream.to_s.strip)
+    end
+
+    def validate_set_server(cmd)
+      validate_empty_set_server(cmd.stdout)
+      validate_empty_set_server(cmd.stderr)
+    end
+
     def set_dns_server_addresses(interface_index, addresses)
       script_code = "Set-DnsClientServerAddress -InterfaceIndex #{interface_index}"\
        " -ServerAddresses (\"#{addresses.join('","')}\")"
       cmd = log_powershell_out('dns server', script_code)
-      raise 'Failed to set server addresses' unless empty_string?(cmd.stdout.to_s.strip)
+      validate_set_server(cmd)
     end
 
     def set_dns_suffix(interface_index, dns_suffix)
       script_code = "Set-DnsClient -InterfaceIndex #{interface_index} -ConnectionSpecificSuffix '#{dns_suffix.suffix}'"\
         " -RegisterThisConnectionsAddress $#{dns_suffix.register}"
       cmd = log_powershell_out('dns suffix', script_code)
-      raise 'Failed to set server addresses' unless empty_string?(cmd.stdout.to_s.strip)
+      validate_set_server(cmd)
     end
 
     def process_interface(dns_client, iface_index)
