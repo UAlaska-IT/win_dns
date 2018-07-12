@@ -50,7 +50,9 @@ platforms:
   - name: mwrock/Windows2016
     transport:
       name: winrm
-  - name: devopsgroup-io/windows_server-2012r2-standard-amd64-nocm
+  - name: mwrock/Windows2012R2
+    transport:
+      name: winrm
   - name: salesforce/server2008r2
     transport:
       name: winrm
@@ -65,5 +67,5 @@ suites:
     attributes:
     includes:
       - mwrock/Windows2016
-      - devopsgroup-io/windows_server-2012r2-standard-amd64-nocm
+      - mwrock/Windows2012R2
       - salesforce/server2008r2
