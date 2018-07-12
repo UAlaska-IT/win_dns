@@ -97,7 +97,10 @@ Select InterfaceIndex, AdapterType, NetConnectionID, Name'
     end
 
     def run_dns_suffix_script(interface_index)
-      script_code = "Get-DNSClient -InterfaceIndex #{interface_index} | select ConnectionSpecificSuffix"
+      # Get-DNSClient -InterfaceIndex #{interface_index} | select ConnectionSpecificSuffix
+      script_code = "Get-WmiObject win32_NetworkAdapterConfiguration \
+-Filter \"InterfaceIndex = #{interface_index}\" |\
+ Select DnsDomain"
       cmd = log_powershell_out('parse', script_code)
       raise "Interface #{interface_index} not found" if cmd.stdout.to_s.match?(/No MSFT_DNSClient/)
       return cmd
@@ -107,7 +110,7 @@ Select InterfaceIndex, AdapterType, NetConnectionID, Name'
       Chef::Log.debug("Line: '#{line}'")
       line = line.strip
       Chef::Log.debug("Stripped line: '#{line}'")
-      return if line_matches_or_empty?(line, /^ConnectionSpecificSuffix/) # The header
+      return if line_matches_or_empty?(line, /^(DnsDomain|-)/) # The header
       retval.push(line)
     end
 
