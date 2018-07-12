@@ -74,13 +74,18 @@ Select InterfaceIndex, AdapterType, NetConnectionID, Name'
       end
     end
 
+    def validate_set_server_addresses(interface_index, cmd)
+      raise "Interface #{interface_index} not found" if cmd.stdout.to_s.match?(/No matching/)
+      raise "Server address script failed: #{cmd.stderr} " unless empty_string?(cmd.stderr.to_s.strip)
+    end
+
     def run_server_address_script(interface_index)
       # Get-DNSClientServerAddress -AddressFamily IPv4 -InterfaceIndex #{interface_index} | select ServerAddresses
       script_code = "Get-WmiObject win32_NetworkAdapterConfiguration \
 -Filter \"InterfaceIndex = #{interface_index}\" |\
  Select DnsServerSearchOrder"
       cmd = log_powershell_out('parse', script_code)
-      raise "Interface #{interface_index} not found" if cmd.stdout.to_s.match?(/No matching/)
+      validate_set_server_addresses(interface_index, cmd)
       return cmd
     end
 
