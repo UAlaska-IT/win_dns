@@ -150,13 +150,17 @@ Select InterfaceIndex, AdapterType, NetConnectionID, Name'
     end
 
     def validate_set_server(cmd)
-      validate_empty_set_server(cmd.stdout)
+      # validate_empty_set_server(cmd.stdout)
       validate_empty_set_server(cmd.stderr)
     end
 
     def set_dns_server_addresses(interface_index, addresses)
-      script_code = "Set-DnsClientServerAddress -InterfaceIndex #{interface_index}"\
-       " -ServerAddresses (\"#{addresses.join('","')}\")"
+      addresses = "\"#{addresses.join('","')}\""
+      # Set-DnsClientServerAddress -InterfaceIndex #{interface_index}" -ServerAddresses (#{addresses})
+      script_code = "$wmi = Get-WmiObject win32_networkadapterconfiguration \
+-filter \"InterfaceIndex = #{interface_index}\";\n\
+$servers = #{addresses};\n\
+$wmi.SetDNSServerSearchOrder($servers)"
       cmd = log_powershell_out('dns server', script_code)
       validate_set_server(cmd)
     end
