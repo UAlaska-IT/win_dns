@@ -155,7 +155,7 @@ Select InterfaceIndex, AdapterType, NetConnectionID, Name'
     end
 
     def set_dns_server_addresses(interface_index, addresses)
-      addresses = "\"#{addresses.join('","')}\""
+      addresses = "'#{addresses.join('","')}'"
       # Set-DnsClientServerAddress -InterfaceIndex #{interface_index}" -ServerAddresses (#{addresses})
       script_code = "$wmi = Get-WmiObject win32_networkadapterconfiguration \
 -filter \"InterfaceIndex = #{interface_index}\";\n\
@@ -166,8 +166,11 @@ $wmi.SetDNSServerSearchOrder($servers)"
     end
 
     def set_dns_suffix(interface_index, dns_suffix)
-      script_code = "Set-DnsClient -InterfaceIndex #{interface_index} -ConnectionSpecificSuffix '#{dns_suffix.suffix}'"\
-        " -RegisterThisConnectionsAddress $#{dns_suffix.register}"
+      # Set-DnsClient -InterfaceIndex #{interface_index} -ConnectionSpecificSuffix '#{dns_suffix.suffix}'"\
+      # " -RegisterThisConnectionsAddress $#{dns_suffix.register}
+      script_code = "$wmi = Get-WmiObject Win32_NetworkAdapterConfiguration \
+-filter \"InterfaceIndex = #{interface_index}\";\n\
+$wmi.SetDNSDomain('#{dns_suffix.suffix}')"
       cmd = log_powershell_out('dns suffix', script_code)
       validate_set_server(cmd)
     end
