@@ -92,7 +92,7 @@ Select InterfaceIndex, AdapterType, NetConnectionID, Name'
         count += 1
         parse_server_address_line(line, retval)
       end
-      Chef::Log.debug("Processed #{count} lines, found #{retval.size} server IPs")
+      Chef::Log.debug("Processed #{count} lines, found #{retval.size} server IPs:\n#{retval}")
       return retval
     end
 
