@@ -67,7 +67,7 @@ Select InterfaceIndex, AdapterType, NetConnectionID, Name'
       Chef::Log.debug("Line: '#{line}'")
       line = line.strip
       Chef::Log.debug("Stripped line: '#{line}'")
-      return if line_matches_or_empty?(line, /^ServerAddresses/) # The header
+      return if line_matches_or_empty?(line, /^(DnsServerSearchOrder|-)/) # The header
       line = line[1, line.length - 2] # Strip braces
       line.split(', ').each do |ip|
         retval.push(ip)
@@ -75,8 +75,10 @@ Select InterfaceIndex, AdapterType, NetConnectionID, Name'
     end
 
     def run_server_address_script(interface_index)
-      script_code = 'Get-DNSClientServerAddress -AddressFamily IPv4'\
-        " -InterfaceIndex #{interface_index} | select ServerAddresses"
+      # Get-DNSClientServerAddress -AddressFamily IPv4 -InterfaceIndex #{interface_index} | select ServerAddresses
+      script_code = "Get-WmiObject win32_NetworkAdapterConfiguration \
+-Filter \"InterfaceIndex = #{interface_index}\" |\
+ Select DnsServerSearchOrder"
       cmd = log_powershell_out('parse', script_code)
       raise "Interface #{interface_index} not found" if cmd.stdout.to_s.match?(/No matching/)
       return cmd
@@ -158,7 +160,7 @@ Select InterfaceIndex, AdapterType, NetConnectionID, Name'
     end
 
     def set_dns_server_addresses(interface_index, addresses)
-      addresses = "'#{addresses.join('","')}'"
+      addresses = "\"#{addresses.join('","')}\""
       # Set-DnsClientServerAddress -InterfaceIndex #{interface_index}" -ServerAddresses (#{addresses})
       script_code = "$wmi = Get-WmiObject win32_NetworkAdapterConfiguration \
 -Filter \"InterfaceIndex = #{interface_index}\";\n\
@@ -181,6 +183,7 @@ $wmi.SetDNSDomain('#{dns_suffix.suffix}')"
     def process_interface(dns_client, iface_index)
       server_addresses = parse_server_addresses(iface_index)
       Chef::Log.debug("Current Addresses: #{server_addresses}")
+      Chef::Log.debug("New Addresses: #{dns_client.name_servers}")
       diff = diff_server_addresses(server_addresses, dns_client.name_servers)
       Chef::Log.debug("Diff addresses: #{diff}")
 
