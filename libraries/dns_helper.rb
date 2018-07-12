@@ -10,9 +10,9 @@ module DNS
     end
 
     def log_powershell_out(script_name, script_code)
-      Chef::Log.debug("Running #{script_name} script: '#{script_code}'")
+      Chef::Log.debug("Running #{script_name} script:\n'#{script_code}'")
       cmd = powershell_out(script_code)
-      Chef::Log.debug("Returned from #{script_name} script: '#{cmd.stdout}'")
+      Chef::Log.debug("Returned from #{script_name} script:\n'#{cmd.stdout}'")
       return cmd
     end
 
@@ -27,7 +27,7 @@ module DNS
       Chef::Log.debug("Line: '#{line}'")
       line = line.strip
       Chef::Log.debug("Stripped line: '#{line}'")
-      return if line_matches_or_empty?(line, /^[InterfaceIndex|-]/) # The header
+      return if line_matches_or_empty?(line, /^(InterfaceIndex|-)/) # The header
       space = line.index(' ')
 
       index = line[0, space]
