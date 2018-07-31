@@ -11,6 +11,8 @@ script = <<-SCRIPT
 SCRIPT
 
 describe powershell(script) do
-  its('stdout') { should match '137.229.15.5, 137.229.15.9, 8.8.8.8' }
-  its('stdout') { should match 'alaska.edu' }
+  its(:exit_status) { should eq 0 }
+  its(:stderr) { should eq '' }
+  its(:stdout) { should match '137.229.15.5, 137.229.15.9, 8.8.8.8' }
+  its(:stdout) { should match 'alaska.edu' }
 end
