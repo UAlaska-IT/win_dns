@@ -10,7 +10,7 @@ The custom resources in this cookbook implement the _mechanism_ for configuring 
 
 ### Chef
 
-Version 2.0.0+ of this cookbook requires Chef 13+
+This cookbook requires Chef 13+
 
 ### Platforms
 
@@ -20,28 +20,34 @@ Supported Platform Families:
 
 Platforms validated via Test Kitchen:
 
-* Windows 10
 * Windows Server 2016
+* Windows Server 2012
+* Windows Server 2008R2
+* Windows 10
 
 Notes:
 
-* Only Windows 2016 is fully tested.
-* Custom resources typically use raw PowerShell scripts for converge and idempotence.  Most recipes therefore should support older versions of Windows, but these are not tested.
-* Cookbook dependencies are handled via Berkshelf and are verified only to be compatible with Windows 2016/10.
+* This is a low-level cookbook with precondition that Powershell 5.0 is installed
+  * Custom resources will not work with previous versions of Powershell
+  * Windows 2008 and 2012 require WMF update to install Powershell 5.0
+  * Powershell is not installed by this cookbook
 
 ## Resources
 
 This cookbook provides two resources for configuring DNS in Windows using Powershell.  See [Set-DnsClientServerAddress](https://technet.microsoft.com/en-us/itpro/powershell/windows/dnsclient/set-dnsclientserveraddress) for details on managing static DNS in Windows.  See [Set-DnsClient](https://technet.microsoft.com/en-us/itpro/powershell/windows/dnsclient/set-dnsclient) for details on managing DNS name on Windows.
 
 ### dns_client
+
 A dns_client provides a single action to configure static DNS settings for a network interface.
 
 __Actions__
+
 One action is provided.
 
 * `set_server_ips` - Post condition is that the named interface uses the assigned name servers for DNS lookup.
 
 __Attributes__
+
 This resource has four attributes.
 
 * `name` - The `name_property` of the resource.  Must be unique but otherwise ignored.
@@ -50,14 +56,17 @@ This resource has four attributes.
 * `name_servers` - An array of server IPs as strings.
 
 ### dns_suffix
+
 This resource provides a single action to configure the DNS suffix for a network interface.
 
 __Actions__
+
 One action is provided.
 
 * `set_suffix` - Post condition is that the named interface is configured to use the given suffix.
 
 __Attributes__
+
 This resource has five attributes.
 
 * `name` - The `name_property` of the resource.  Must be unique but otherwise ignored.
@@ -67,11 +76,31 @@ This resource has five attributes.
 * `register` - Default to `true`.  Determines if this node is registered for DNS lookup.
 
 ## Attributes
+
 Resources in this cookbook do not reference any attributes.
 
 ## Recipes
 
-This is a resource-only cookbook; and adding the default recipe to a node's runlist will have no effect.
+### win_dns::default
+
+This recipe configures possibly both DNS client behavior and DNS suffix.
+
+__Attributes__
+
+Only interfaces matching the interface alias will be configured.
+
+* `node['win_dns']['interface_alias']` - Defaults to `ethernet`.  The alias of the connection on which to configure client server and suffix.  Not case sensitive and used as a regular expression.  All interfaces that match the alias regex will be configured.
+
+DNS client attributes:
+
+* `node['win_dns']['static_dns']` - Defaults to `true`. Determines if static DNS client settings are applied to the system.
+* `node['win_dns']['nameservers']` - Defaults to an array of UA name servers and a fallback Google server.  See attributes/dns.rb for the default values.
+
+DNS suffix attributes:
+
+* `node['win_dns']['set_dns_suffix']` - Defaults to `true`. Determines if a DNS suffix is configured for the system.  If set to `false`, the windows default of `localdomain` will not allow this host to be found via DNS lookup.
+* `node['win_dns']['suffix']` - Defaults to `alaska.edu`.  The DNS suffix to configure for the chosen interface.
+* `node['win_dns']['register']` - Defaults to `true`.  Determines if the host DNS name is registered.
 
 ## Examples
 
@@ -109,21 +138,5 @@ For running tests in Test Kitchen a few dependencies must be installed.
 * [ChefDK](https://downloads.chef.io/chef-dk/)
 * [Vagrant](https://www.vagrantup.com/)
 * [VirtualBox](https://www.virtualbox.org/wiki/Downloads)
-* Install dependency tree with `berks install`
-* Install Vagrant WinRM plugin:  `vagrant plugin install vagrant-winrm`
-
-### Windows Server 2016 Box
-
-This cookbook was tested in Test Kitchen using the base box at
-
-`\\fbk-tss-store1.apps.ad.alaska.edu\Department\Technology Support Services\Engineering\Packer Boxes\win2016gui-virtualbox.box`
-
-If this box has not been cached by Vagrant, it can be placed (without .box extension) in the kitchen-generated directory
-
-`.kitchen/kitchen-vagrant/kitchen-se-win-baseline-default-win2016gui-virtualbox/.vagrant/machines/default/virtualbox`
-
-or added to Vagrant using the shell command
-
-`vagrant box add <base_box> <base_box>.box`
-
-Windows boxes are not widely available as standard downloads, but alternative base boxes can be built, for example using [boxcutter](https://github.com/boxcutter/windows).
+* Install the dependency tree with `berks install`
+* Install the Vagrant WinRM plugin:  `vagrant plugin install vagrant-winrm`

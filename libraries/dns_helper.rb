@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-include Chef::Mixin::PowershellOut
-
+# This module implements helpers that are used for DNS resources
 module DNS
+  include Chef::Mixin::PowershellOut
   # This module implements helpers that are used for DNS resources
   module Helper
     def empty_string?(string)
@@ -10,9 +10,9 @@ module DNS
     end
 
     def log_powershell_out(script_name, script_code)
-      Chef::Log.debug("Running #{script_name} script: '#{script_code}'")
+      Chef::Log.debug("Running #{script_name} script:\n'#{script_code}'")
       cmd = powershell_out(script_code)
-      Chef::Log.debug("Returned from #{script_name} script: '#{cmd.stdout}'")
+      Chef::Log.debug("Returned from #{script_name} script:\n'#{cmd.stdout}'")
       return cmd
     end
 
@@ -27,11 +27,11 @@ module DNS
       Chef::Log.debug("Line: '#{line}'")
       line = line.strip
       Chef::Log.debug("Stripped line: '#{line}'")
-      return if line_matches_or_empty?(line, /^ifIndex/) # The header
+      return if line_matches_or_empty?(line, /^(InterfaceIndex|-)/) # The header
       space = line.index(' ')
 
       index = line[0, space]
-      name = line[space + 1, line.length - space - 1]
+      name = line[space + 1, line.length - space - 1].gsub(/\s+/, ' ')
 
       retval[name.downcase] = index
     end
@@ -51,8 +51,11 @@ module DNS
     # Keys and values will be in lowercase
     def parse_network_adapters
       # netsh interface ipv4 show interfaces
-      script_code = 'Get-NetAdapter | Sort-Object ifIndex | select ifIndex, Name'
+      # Get-NetAdapter | Sort-Object ifIndex | select ifIndex, Name
+      script_code = 'Get-WMIObject Win32_NetworkAdapter | Sort-Object InterfaceIndex |
+Select InterfaceIndex, AdapterType, NetConnectionID, Name'
       cmd = log_powershell_out('parse', script_code)
+      Chef::Log.debug("\nRaw Adapters\n#{cmd.stdout.to_s.strip}")
 
       interfaces = parse_network_adapter_lines(cmd)
 
@@ -64,18 +67,25 @@ module DNS
       Chef::Log.debug("Line: '#{line}'")
       line = line.strip
       Chef::Log.debug("Stripped line: '#{line}'")
-      return if line_matches_or_empty?(line, /^ServerAddresses/) # The header
+      return if line_matches_or_empty?(line, /^(DnsServerSearchOrder|-)/) # The header
       line = line[1, line.length - 2] # Strip braces
       line.split(', ').each do |ip|
         retval.push(ip)
       end
     end
 
-    def run_server_address_script(interface_index)
-      script_code = 'Get-DNSClientServerAddress -AddressFamily IPv4'\
-        " -InterfaceIndex #{interface_index} | select ServerAddresses"
-      cmd = log_powershell_out('parse', script_code)
+    def validate_set_server_addresses(interface_index, cmd)
       raise "Interface #{interface_index} not found" if cmd.stdout.to_s.match?(/No matching/)
+      raise "Server address script failed: #{cmd.stderr} " unless empty_string?(cmd.stderr.to_s.strip)
+    end
+
+    def run_server_address_script(interface_index)
+      # Get-DNSClientServerAddress -AddressFamily IPv4 -InterfaceIndex #{interface_index} | select ServerAddresses
+      script_code = "Get-WmiObject win32_NetworkAdapterConfiguration \
+-Filter \"InterfaceIndex = #{interface_index}\" |\
+ Select DnsServerSearchOrder"
+      cmd = log_powershell_out('parse', script_code)
+      validate_set_server_addresses(interface_index, cmd)
       return cmd
     end
 
@@ -89,12 +99,15 @@ module DNS
         count += 1
         parse_server_address_line(line, retval)
       end
-      Chef::Log.debug("Processed #{count} lines, found #{retval.size} server IPs")
+      Chef::Log.debug("Processed #{count} lines, found #{retval.size} server IPs:\n#{retval}")
       return retval
     end
 
     def run_dns_suffix_script(interface_index)
-      script_code = "Get-DNSClient -InterfaceIndex #{interface_index} | select ConnectionSpecificSuffix"
+      # Get-DNSClient -InterfaceIndex #{interface_index} | select ConnectionSpecificSuffix
+      script_code = "Get-WmiObject win32_NetworkAdapterConfiguration \
+-Filter \"InterfaceIndex = #{interface_index}\" |\
+ Select DnsDomain"
       cmd = log_powershell_out('parse', script_code)
       raise "Interface #{interface_index} not found" if cmd.stdout.to_s.match?(/No MSFT_DNSClient/)
       return cmd
@@ -104,7 +117,7 @@ module DNS
       Chef::Log.debug("Line: '#{line}'")
       line = line.strip
       Chef::Log.debug("Stripped line: '#{line}'")
-      return if line_matches_or_empty?(line, /^ConnectionSpecificSuffix/) # The header
+      return if line_matches_or_empty?(line, /^(DnsDomain|-)/) # The header
       retval.push(line)
     end
 
@@ -142,23 +155,40 @@ module DNS
       return retval
     end
 
+    def validate_empty_set_server(stream)
+      raise "Failed to set server addresses: #{stream.to_s.strip}" unless empty_string?(stream.to_s.strip)
+    end
+
+    def validate_set_server(cmd)
+      # validate_empty_set_server(cmd.stdout)
+      validate_empty_set_server(cmd.stderr)
+    end
+
     def set_dns_server_addresses(interface_index, addresses)
-      script_code = "Set-DnsClientServerAddress -InterfaceIndex #{interface_index}"\
-       " -ServerAddresses (\"#{addresses.join('","')}\")"
+      addresses = "\"#{addresses.join('","')}\""
+      # Set-DnsClientServerAddress -InterfaceIndex #{interface_index}" -ServerAddresses (#{addresses})
+      script_code = "$wmi = Get-WmiObject win32_NetworkAdapterConfiguration \
+-Filter \"InterfaceIndex = #{interface_index}\";\n\
+$servers = #{addresses};\n\
+$wmi.SetDNSServerSearchOrder($servers)"
       cmd = log_powershell_out('dns server', script_code)
-      raise 'Failed to set server addresses' unless empty_string?(cmd.stdout.to_s.strip)
+      validate_set_server(cmd)
     end
 
     def set_dns_suffix(interface_index, dns_suffix)
-      script_code = "Set-DnsClient -InterfaceIndex #{interface_index} -ConnectionSpecificSuffix '#{dns_suffix.suffix}'"\
-        " -RegisterThisConnectionsAddress $#{dns_suffix.register}"
+      # Set-DnsClient -InterfaceIndex #{interface_index} -ConnectionSpecificSuffix '#{dns_suffix.suffix}'"\
+      # " -RegisterThisConnectionsAddress $#{dns_suffix.register}
+      script_code = "$wmi = Get-WmiObject Win32_NetworkAdapterConfiguration \
+-Filter \"InterfaceIndex = #{interface_index}\";\n\
+$wmi.SetDNSDomain('#{dns_suffix.suffix}')"
       cmd = log_powershell_out('dns suffix', script_code)
-      raise 'Failed to set server addresses' unless empty_string?(cmd.stdout.to_s.strip)
+      validate_set_server(cmd)
     end
 
     def process_interface(dns_client, iface_index)
       server_addresses = parse_server_addresses(iface_index)
       Chef::Log.debug("Current Addresses: #{server_addresses}")
+      Chef::Log.debug("New Addresses: #{dns_client.name_servers}")
       diff = diff_server_addresses(server_addresses, dns_client.name_servers)
       Chef::Log.debug("Diff addresses: #{diff}")
 
@@ -210,3 +240,6 @@ module DNS
     end
   end
 end
+
+Chef::Recipe.include(DNS::Helper)
+Chef::Resource.include(DNS::Helper)
