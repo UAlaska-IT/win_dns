@@ -40,7 +40,8 @@ platforms:
   - name: fedora-28
   - name: fedora-27
   - name: fedora-26
-  - name: stakahashi/amazonlinux2
+  - name: gbailey/amzn2 # 2018.08
+  - name: stakahashi/amazonlinux2 # 2017.12
   - name: realreadme/amazon2016.09
   - name: opensuse-leap-42.3
   - name: freebsd-11.1
