@@ -109,7 +109,7 @@ DNS suffix attributes:
 dns_client 'Configure Static DNS' do
   interface_name 'ethernet'
   use_regex_for_interface true
-  name_servers ['137.229.15.5', '137.229.15.9', '8.8.8.8']
+  name_servers ['8.8.8.8', '8.8.8.4'] # Public DNS; in production use nameservers inside the datacenter
 end
 
 dns_suffix 'Set DNS Suffix' do

@@ -66,6 +66,11 @@ suites:
       inspec_tests:
         - test/smoke/default
     attributes:
+      win_dns:
+        nameservers: # Google public DNS
+          - '8.8.8.8'
+          - '8.8.8.4'
+        suffix: 'alaska.edu'
     includes:
       - mwrock/Windows2016
       - a-mcf/Win2012R2-WMF5-min

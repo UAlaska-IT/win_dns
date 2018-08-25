@@ -13,6 +13,6 @@ SCRIPT
 describe powershell(script) do
   its(:exit_status) { should eq 0 }
   its(:stderr) { should eq '' }
-  its(:stdout) { should match '137.229.15.5, 137.229.15.9, 8.8.8.8' }
+  its(:stdout) { should match '8.8.8.8, 8.8.8.4' }
   its(:stdout) { should match 'alaska.edu' }
 end
