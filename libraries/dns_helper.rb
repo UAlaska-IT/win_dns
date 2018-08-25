@@ -241,5 +241,6 @@ $wmi.SetDNSDomain('#{dns_suffix.suffix}')"
   end
 end
 
-Chef::Recipe.include(DNS::Helper)
-Chef::Resource.include(DNS::Helper)
+Chef::Provider.include(ChefRunRecorder::Helper)
+Chef::Recipe.include(ChefRunRecorder::Helper)
+Chef::Resource.include(ChefRunRecorder::Helper)
