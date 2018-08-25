@@ -53,7 +53,6 @@ __Attributes__
 
 This resource has four attributes.
 
-* `name` - The `name_property` of the resource.  Must be unique but otherwise ignored.
 * `interface_name` - Defaults to `ethernet`.  The alias for the interfaces to be configured, not case sensitive.
 * `use_regex_for_interface` - Default to `true`.  Determines if the `interface_name` is used as a regex.  If true, all interfaces for which the the alias regex matches are configured.
 * `name_servers` - An array of server IPs as strings.
@@ -72,7 +71,6 @@ __Attributes__
 
 This resource has five attributes.
 
-* `name` - The `name_property` of the resource.  Must be unique but otherwise ignored.
 * `interface_name` - Defaults to `ethernet`.  The alias for the interfaces to be configured, not case sensitive.
 * `use_regex_for_interface` - Default to `true`.  Determines if the `interface_name` is used as a regex.  If true, all interfaces for which the the alias regex matches are configured.
 * `suffix` - The DNS suffix for this node, that will be concatenated to form a fully qualified domain name, e.g. 'alaska.edu'.
@@ -97,12 +95,12 @@ Only interfaces matching the interface alias will be configured.
 DNS client attributes:
 
 * `node['win_dns']['static_dns']` - Defaults to `true`. Determines if static DNS client settings are applied to the system.
-* `node['win_dns']['nameservers']` - Defaults to an array of UA name servers and a fallback Google server.  See attributes/dns.rb for the default values.
+* `node['win_dns']['nameservers']` - Defaults to `nil`.  The array of IP addresses of nameservers to be configured. Must be non-nil for static DNS to be configured.
 
 DNS suffix attributes:
 
-* `node['win_dns']['set_dns_suffix']` - Defaults to `true`. Determines if a DNS suffix is configured for the system.  If set to `false`, the windows default of `localdomain` will not allow this host to be found via DNS lookup.
-* `node['win_dns']['suffix']` - Defaults to `alaska.edu`.  The DNS suffix to configure for the chosen interface.
+* `node['win_dns']['set_suffix']` - Defaults to `true`. Determines if a DNS suffix is configured for the system.  If set to `false`, the windows default of `localdomain` will not allow this host to be found via DNS lookup.
+* `node['win_dns']['suffix']` - Defaults to `nil`.  The DNS suffix to configure for the chosen interface. Must be non-nil for the DNS suffix to be configured.
 * `node['win_dns']['register']` - Defaults to `true`.  Determines if the host DNS name is registered.
 
 ## Examples
