@@ -13,6 +13,8 @@ RedundantReturn:
   Enabled: false
 Style/ClassVars:
   Enabled: false
+Style/SymbolArray:
+  EnforcedStyle: brackets
 Style/WordArray:
   EnforcedStyle: brackets
 Style/SymbolArray:
