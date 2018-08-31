@@ -16,7 +16,7 @@ action :set_suffix do
 end
 
 action_class.class_eval do
-  include ::DNS::Helper
+  include ::WinDNS::Helper
 
   def set_suffix_helper(new_resource)
     ensure_dns_suffix(new_resource)
