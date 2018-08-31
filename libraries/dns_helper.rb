@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # This module implements helpers that are used for DNS resources
-module DNS
+module WinDNS
   include Chef::Mixin::PowershellOut
   # This module implements helpers that are used for DNS resources
   module Helper
@@ -241,6 +241,6 @@ $wmi.SetDNSDomain('#{dns_suffix.suffix}')"
   end
 end
 
-Chef::Provider.include(ChefRunRecorder::Helper)
-Chef::Recipe.include(ChefRunRecorder::Helper)
-Chef::Resource.include(ChefRunRecorder::Helper)
+Chef::Provider.include(WinDNS::Helper)
+Chef::Recipe.include(WinDNS::Helper)
+Chef::Resource.include(WinDNS::Helper)
