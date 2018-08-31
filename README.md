@@ -1,5 +1,8 @@
 # Windows DNS Cookbook
 
+[![License](https://img.shields.io/github/license/ualaska-it/win_dns.svg)](https://github.com/ualaska-it/win_dns)
+[![GitHub Tag](https://img.shields.io/github/tag/ualaska-it/win_dns.svg)](https://github.com/ualaska-it/win_dns)
+
 __Maintainer: OIT Systems Engineering__ (<ua-oit-se@alaska.edu>)
 
 ## Purpose
@@ -104,6 +107,8 @@ DNS suffix attributes:
 * `node['win_dns']['register']` - Defaults to `true`.  Determines if the host DNS name is registered.
 
 ## Examples
+
+Custom resources can be used as below.
 
 ```ruby
 dns_client 'Configure Static DNS' do
