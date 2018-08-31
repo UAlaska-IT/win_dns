@@ -26,6 +26,7 @@ Platforms validated via Test Kitchen:
 * Windows Server 2016
 * Windows Server 2012
 * Windows Server 2008R2
+* Windows 10
 
 Notes:
 
