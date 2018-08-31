@@ -124,3 +124,7 @@ dns_suffix 'Set DNS Suffix' do
   register true
 end
 ```
+
+## Development
+
+See CONTRIBUTING.md and TESTING.md.
