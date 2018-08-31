@@ -2,6 +2,8 @@
 
 tcb = 'win_dns'
 
+include_recipe 'chef_run_recorder::default'
+
 if node[tcb]['static_dns'] && ![tcb]['nameservers'].nil?
   dns_client 'Static DNS' do
     interface_name node[tcb]['interface_alias']
