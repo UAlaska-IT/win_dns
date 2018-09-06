@@ -12,7 +12,7 @@ if node[tcb]['static_dns'] && !node[tcb]['nameservers'].nil?
   end
 end
 
-if node[tcb]['set_suffix'] && !node[tcb]['set_suffix'].nil?
+if node[tcb]['set_suffix'] && !node[tcb]['suffix'].nil?
   dns_suffix 'Set DNS Suffix' do
     interface_name node[tcb]['interface_alias']
     use_regex_for_interface true
