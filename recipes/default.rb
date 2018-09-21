@@ -2,7 +2,9 @@
 
 tcb = 'win_dns'
 
-if node[tcb]['static_dns']
+include_recipe 'chef_run_recorder::default'
+
+if node[tcb]['static_dns'] && !node[tcb]['nameservers'].nil?
   dns_client 'Static DNS' do
     interface_name node[tcb]['interface_alias']
     use_regex_for_interface true
@@ -10,7 +12,7 @@ if node[tcb]['static_dns']
   end
 end
 
-if node[tcb]['set_dns_suffix']
+if node[tcb]['set_suffix'] && !node[tcb]['suffix'].nil?
   dns_suffix 'Set DNS Suffix' do
     interface_name node[tcb]['interface_alias']
     use_regex_for_interface true

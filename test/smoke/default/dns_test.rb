@@ -6,13 +6,16 @@ describe host('google.com') do
   it { should be_reachable }
 end
 
-script = <<-SCRIPT
-  Get-WmiObject win32_NetworkAdapterConfiguration | Select DnsServerSearchOrder, DnsDomain
-SCRIPT
-
-describe powershell(script) do
+# DNS Servers
+describe powershell('Get-WmiObject win32_NetworkAdapterConfiguration | Select DnsServerSearchOrder') do
   its(:exit_status) { should eq 0 }
   its(:stderr) { should eq '' }
-  its(:stdout) { should match '137.229.15.5, 137.229.15.9, 8.8.8.8' }
+  its(:stdout) { should match '8.8.8.8, 8.8.8.4' }
+end
+
+# DNS Suffix
+describe powershell('Get-WmiObject win32_NetworkAdapterConfiguration | Select DnsDomain') do
+  its(:exit_status) { should eq 0 }
+  its(:stderr) { should eq '' }
   its(:stdout) { should match 'alaska.edu' }
 end

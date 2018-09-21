@@ -15,7 +15,7 @@ action :set_server_ips do
 end
 
 action_class.class_eval do
-  include ::DNS::Helper
+  include ::WinDNS::Helper
 
   def set_server_ips_helper(new_resource)
     ensure_dns_server_ips(new_resource)
